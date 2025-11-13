@@ -19,5 +19,12 @@ public interface AcOutRepository extends JpaRepository<AcOut, LocalDateTime> {
 
     @Query("SELECT AVG(CAST(a.value AS double)) FROM AcOut a WHERE a.time BETWEEN :start AND :end")
     Double getAverageValueBetween(LocalDateTime start, LocalDateTime end);
+
+    @Query(value = "SELECT DATE_FORMAT(time, '%Y-%m-%d-%H') as hour, SUM(value) as total " +
+                   "FROM item0182 " +
+                   "WHERE DATE(time) = :date " +
+                   "GROUP BY DATE_FORMAT(time, '%Y-%m-%d-%H') " +
+                   "ORDER BY hour", nativeQuery = true)
+    List<Object[]> getHourlySumsByDate(String date);
 }
 

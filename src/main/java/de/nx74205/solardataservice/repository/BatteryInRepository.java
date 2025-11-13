@@ -19,5 +19,12 @@ public interface BatteryInRepository extends JpaRepository<BatteryIn, LocalDateT
 
     @Query("SELECT AVG(CAST(b.value AS double)) FROM BatteryIn b WHERE b.time BETWEEN :start AND :end")
     Double getAverageValueBetween(LocalDateTime start, LocalDateTime end);
+
+    @Query(value = "SELECT DATE_FORMAT(time, '%Y-%m-%d-%H') as hour, SUM(value) as total " +
+                   "FROM item0197 " +
+                   "WHERE DATE(time) = :date " +
+                   "GROUP BY DATE_FORMAT(time, '%Y-%m-%d-%H') " +
+                   "ORDER BY hour", nativeQuery = true)
+    List<Object[]> getHourlySumsByDate(String date);
 }
 

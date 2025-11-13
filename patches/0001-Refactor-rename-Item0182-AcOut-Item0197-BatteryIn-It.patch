@@ -1,0 +1,543 @@
+From 87bd41d6a2a9e6d00990492e0519010a15fe2921 Mon Sep 17 00:00:00 2001
+From: nx74205 <kl.volmer@gmx.de>
+Date: Thu, 13 Nov 2025 11:03:38 +0100
+Subject: [PATCH] Refactor: rename Item0182->AcOut, Item0197->BatteryIn,
+ Item0198->BatteryOut; add repositories; update service & controller; remove
+ old stubs
+
+---
+ .../controller/SolarDataController.java       | 65 ++++++++---------
+ .../solardataservice/entity/AcOut.java        | 19 +++++
+ .../solardataservice/entity/BatteryIn.java    | 18 +++++
+ .../solardataservice/entity/BatteryOut.java   | 19 +++++
+ .../solardataservice/entity/Item0197.java     | 20 +----
+ .../solardataservice/entity/Item0198.java     | 20 +----
+ .../repository/AcOutRepository.java           | 23 ++++++
+ .../repository/BatteryInRepository.java       | 23 ++++++
+ .../repository/BatteryOutRepository.java      | 23 ++++++
+ .../repository/Item0197Repository.java        | 28 +------
+ .../repository/Item0198Repository.java        | 27 +------
+ .../service/SolarDataService.java             | 73 ++++++++++++-------
+ 12 files changed, 217 insertions(+), 141 deletions(-)
+ create mode 100644 src/main/java/de/nx74205/solardataservice/entity/AcOut.java
+ create mode 100644 src/main/java/de/nx74205/solardataservice/entity/BatteryIn.java
+ create mode 100644 src/main/java/de/nx74205/solardataservice/entity/BatteryOut.java
+ create mode 100644 src/main/java/de/nx74205/solardataservice/repository/AcOutRepository.java
+ create mode 100644 src/main/java/de/nx74205/solardataservice/repository/BatteryInRepository.java
+ create mode 100644 src/main/java/de/nx74205/solardataservice/repository/BatteryOutRepository.java
+
+diff --git a/src/main/java/de/nx74205/solardataservice/controller/SolarDataController.java b/src/main/java/de/nx74205/solardataservice/controller/SolarDataController.java
+index f6e1d19..1192ff8 100644
+--- a/src/main/java/de/nx74205/solardataservice/controller/SolarDataController.java
++++ b/src/main/java/de/nx74205/solardataservice/controller/SolarDataController.java
+@@ -1,7 +1,7 @@
+ package de.nx74205.solardataservice.controller;
+ 
+-import de.nx74205.solardataservice.entity.Item0197;
+-import de.nx74205.solardataservice.entity.Item0198;
++import de.nx74205.solardataservice.entity.BatteryIn;
++import de.nx74205.solardataservice.entity.BatteryOut;
+ import de.nx74205.solardataservice.service.SolarDataService;
+ import lombok.RequiredArgsConstructor;
+ import org.springframework.format.annotation.DateTimeFormat;
+@@ -19,71 +19,70 @@ public class SolarDataController {
+     private final SolarDataService solarDataService;
+ 
+     /**
+-     * GET /api/solar/item0197/latest
+-     * Gibt den neuesten Wert von item0197 zurück
++     * GET /api/solar/battery/in/latest
++     * Gibt den neuesten Wert von BatteryIn zurück
+      */
+-    @GetMapping("/item0197/latest")
+-    public ResponseEntity<Item0197> getLatestItem0197() {
+-        Item0197 latest = solarDataService.getLatestItem0197();
++    @GetMapping("/battery/in/latest")
++    public ResponseEntity<BatteryIn> getLatestBatteryIn() {
++        BatteryIn latest = solarDataService.getLatestBatteryIn();
+         return latest != null ? ResponseEntity.ok(latest) : ResponseEntity.notFound().build();
+     }
+ 
+     /**
+-     * GET /api/solar/item0198/latest
+-     * Gibt den neuesten Wert von item0198 zurück
++     * GET /api/solar/battery/out/latest
++     * Gibt den neuesten Wert von BatteryOut zurück
+      */
+-    @GetMapping("/item0198/latest")
+-    public ResponseEntity<Item0198> getLatestItem0198() {
+-        Item0198 latest = solarDataService.getLatestItem0198();
++    @GetMapping("/battery/out/latest")
++    public ResponseEntity<BatteryOut> getLatestBatteryOut() {
++        BatteryOut latest = solarDataService.getLatestBatteryOut();
+         return latest != null ? ResponseEntity.ok(latest) : ResponseEntity.notFound().build();
+     }
+ 
+     /**
+-     * GET /api/solar/item0197/range?start=2025-01-01T00:00:00&end=2025-01-02T00:00:00
+-     * Gibt alle item0197 Werte in einem Zeitraum zurück
++     * GET /api/solar/battery/in/range?start=2025-01-01T00:00:00&end=2025-01-02T00:00:00
++     * Gibt alle BatteryIn Werte in einem Zeitraum zurück
+      */
+-    @GetMapping("/item0197/range")
+-    public ResponseEntity<List<Item0197>> getItem0197InRange(
++    @GetMapping("/battery/in/range")
++    public ResponseEntity<List<BatteryIn>> getBatteryInInRange(
+             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime start,
+             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime end) {
+-        List<Item0197> data = solarDataService.getItem0197InRange(start, end);
++        List<BatteryIn> data = solarDataService.getBatteryInInRange(start, end);
+         return ResponseEntity.ok(data);
+     }
+ 
+     /**
+-     * GET /api/solar/item0198/range?start=2025-01-01T00:00:00&end=2025-01-02T00:00:00
+-     * Gibt alle item0198 Werte in einem Zeitraum zurück
++     * GET /api/solar/battery/out/range?start=2025-01-01T00:00:00&end=2025-01-02T00:00:00
++     * Gibt alle BatteryOut Werte in einem Zeitraum zurück
+      */
+-    @GetMapping("/item0198/range")
+-    public ResponseEntity<List<Item0198>> getItem0198InRange(
++    @GetMapping("/battery/out/range")
++    public ResponseEntity<List<BatteryOut>> getBatteryOutInRange(
+             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime start,
+             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime end) {
+-        List<Item0198> data = solarDataService.getItem0198InRange(start, end);
++        List<BatteryOut> data = solarDataService.getBatteryOutInRange(start, end);
+         return ResponseEntity.ok(data);
+     }
+ 
+     /**
+-     * GET /api/solar/item0197/average?start=2025-01-01T00:00:00&end=2025-01-02T00:00:00
+-     * Gibt den Durchschnittswert von item0197 in einem Zeitraum zurück
++     * GET /api/solar/battery/in/average?start=2025-01-01T00:00:00&end=2025-01-02T00:00:00
++     * Gibt den Durchschnittswert von BatteryIn in einem Zeitraum zurück
+      */
+-    @GetMapping("/item0197/average")
+-    public ResponseEntity<Double> getAverageItem0197(
++    @GetMapping("/battery/in/average")
++    public ResponseEntity<Double> getAverageBatteryIn(
+             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime start,
+             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime end) {
+-        Double average = solarDataService.getAverageItem0197(start, end);
++        Double average = solarDataService.getAverageBatteryIn(start, end);
+         return average != null ? ResponseEntity.ok(average) : ResponseEntity.notFound().build();
+     }
+ 
+     /**
+-     * GET /api/solar/item0198/average?start=2025-01-01T00:00:00&end=2025-01-02T00:00:00
+-     * Gibt den Durchschnittswert von item0198 in einem Zeitraum zurück
++     * GET /api/solar/battery/out/average?start=2025-01-01T00:00:00&end=2025-01-02T00:00:00
++     * Gibt den Durchschnittswert von BatteryOut in einem Zeitraum zurück
+      */
+-    @GetMapping("/item0198/average")
+-    public ResponseEntity<Double> getAverageItem0198(
++    @GetMapping("/battery/out/average")
++    public ResponseEntity<Double> getAverageBatteryOut(
+             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime start,
+             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime end) {
+-        Double average = solarDataService.getAverageItem0198(start, end);
++        Double average = solarDataService.getAverageBatteryOut(start, end);
+         return average != null ? ResponseEntity.ok(average) : ResponseEntity.notFound().build();
+     }
+ }
+-
+diff --git a/src/main/java/de/nx74205/solardataservice/entity/AcOut.java b/src/main/java/de/nx74205/solardataservice/entity/AcOut.java
+new file mode 100644
+index 0000000..62bdb17
+--- /dev/null
++++ b/src/main/java/de/nx74205/solardataservice/entity/AcOut.java
+@@ -0,0 +1,19 @@
++package de.nx74205.solardataservice.entity;
++
++import jakarta.persistence.*;
++import lombok.Data;
++import java.time.LocalDateTime;
++
++@Data
++@Entity
++@Table(name = "item0182")
++public class AcOut {
++
++    @Id
++    @Column(name = "time")
++    private LocalDateTime time;
++
++    @Column(name = "value")
++    private Double value;
++}
++
+diff --git a/src/main/java/de/nx74205/solardataservice/entity/BatteryIn.java b/src/main/java/de/nx74205/solardataservice/entity/BatteryIn.java
+new file mode 100644
+index 0000000..241c852
+--- /dev/null
++++ b/src/main/java/de/nx74205/solardataservice/entity/BatteryIn.java
+@@ -0,0 +1,18 @@
++package de.nx74205.solardataservice.entity;
++
++import jakarta.persistence.*;
++import lombok.Data;
++import java.time.LocalDateTime;
++
++@Data
++@Entity
++@Table(name = "item0197")
++public class BatteryIn {
++
++    @Id
++    @Column(name = "time")
++    private LocalDateTime time;
++
++    @Column(name = "value")
++    private Double value;
++}
+diff --git a/src/main/java/de/nx74205/solardataservice/entity/BatteryOut.java b/src/main/java/de/nx74205/solardataservice/entity/BatteryOut.java
+new file mode 100644
+index 0000000..facecfb
+--- /dev/null
++++ b/src/main/java/de/nx74205/solardataservice/entity/BatteryOut.java
+@@ -0,0 +1,19 @@
++package de.nx74205.solardataservice.entity;
++
++import jakarta.persistence.*;
++import lombok.Data;
++import java.time.LocalDateTime;
++
++@Data
++@Entity
++@Table(name = "item0198")
++public class BatteryOut {
++
++    @Id
++    @Column(name = "time")
++    private LocalDateTime time;
++
++    @Column(name = "value")
++    private Double value;
++}
++
+diff --git a/src/main/java/de/nx74205/solardataservice/entity/Item0197.java b/src/main/java/de/nx74205/solardataservice/entity/Item0197.java
+index 2585142..e9ad249 100644
+--- a/src/main/java/de/nx74205/solardataservice/entity/Item0197.java
++++ b/src/main/java/de/nx74205/solardataservice/entity/Item0197.java
+@@ -1,19 +1,5 @@
+ package de.nx74205.solardataservice.entity;
+ 
+-import jakarta.persistence.*;
+-import lombok.Data;
+-import java.time.LocalDateTime;
+-
+-@Data
+-@Entity
+-@Table(name = "item0197")
+-public class Item0197 {
+-
+-    @Id
+-    @Column(name = "time")
+-    private LocalDateTime time;
+-
+-    @Column(name = "value")
+-    private Double value;
+-}
+-
++/**
++ * DELETED: Replaced by BatteryIn
++ */
+diff --git a/src/main/java/de/nx74205/solardataservice/entity/Item0198.java b/src/main/java/de/nx74205/solardataservice/entity/Item0198.java
+index 0e7f535..2b3aa22 100644
+--- a/src/main/java/de/nx74205/solardataservice/entity/Item0198.java
++++ b/src/main/java/de/nx74205/solardataservice/entity/Item0198.java
+@@ -1,19 +1,5 @@
+ package de.nx74205.solardataservice.entity;
+ 
+-import jakarta.persistence.*;
+-import lombok.Data;
+-import java.time.LocalDateTime;
+-
+-@Data
+-@Entity
+-@Table(name = "item0198")
+-public class Item0198 {
+-    
+-    @Id
+-    @Column(name = "time")
+-    private LocalDateTime time;
+-    
+-    @Column(name = "value")
+-    private Double value;
+-}
+-
++/**
++ * DELETED: Replaced by BatteryOut
++ */
+diff --git a/src/main/java/de/nx74205/solardataservice/repository/AcOutRepository.java b/src/main/java/de/nx74205/solardataservice/repository/AcOutRepository.java
+new file mode 100644
+index 0000000..699ba1a
+--- /dev/null
++++ b/src/main/java/de/nx74205/solardataservice/repository/AcOutRepository.java
+@@ -0,0 +1,23 @@
++package de.nx74205.solardataservice.repository;
++
++import de.nx74205.solardataservice.entity.AcOut;
++import org.springframework.data.jpa.repository.JpaRepository;
++import org.springframework.data.jpa.repository.Query;
++import org.springframework.stereotype.Repository;
++
++import java.time.LocalDateTime;
++import java.util.List;
++
++@Repository
++public interface AcOutRepository extends JpaRepository<AcOut, LocalDateTime> {
++
++    List<AcOut> findByTimeBetween(LocalDateTime start, LocalDateTime end);
++
++    AcOut findTopByOrderByTimeDesc();
++
++    List<AcOut> findByTimeAfter(LocalDateTime time);
++
++    @Query("SELECT AVG(CAST(a.value AS double)) FROM AcOut a WHERE a.time BETWEEN :start AND :end")
++    Double getAverageValueBetween(LocalDateTime start, LocalDateTime end);
++}
++
+diff --git a/src/main/java/de/nx74205/solardataservice/repository/BatteryInRepository.java b/src/main/java/de/nx74205/solardataservice/repository/BatteryInRepository.java
+new file mode 100644
+index 0000000..cb59bf5
+--- /dev/null
++++ b/src/main/java/de/nx74205/solardataservice/repository/BatteryInRepository.java
+@@ -0,0 +1,23 @@
++package de.nx74205.solardataservice.repository;
++
++import de.nx74205.solardataservice.entity.BatteryIn;
++import org.springframework.data.jpa.repository.JpaRepository;
++import org.springframework.data.jpa.repository.Query;
++import org.springframework.stereotype.Repository;
++
++import java.time.LocalDateTime;
++import java.util.List;
++
++@Repository
++public interface BatteryInRepository extends JpaRepository<BatteryIn, LocalDateTime> {
++
++    List<BatteryIn> findByTimeBetween(LocalDateTime start, LocalDateTime end);
++
++    BatteryIn findTopByOrderByTimeDesc();
++
++    List<BatteryIn> findByTimeAfter(LocalDateTime time);
++
++    @Query("SELECT AVG(CAST(b.value AS double)) FROM BatteryIn b WHERE b.time BETWEEN :start AND :end")
++    Double getAverageValueBetween(LocalDateTime start, LocalDateTime end);
++}
++
+diff --git a/src/main/java/de/nx74205/solardataservice/repository/BatteryOutRepository.java b/src/main/java/de/nx74205/solardataservice/repository/BatteryOutRepository.java
+new file mode 100644
+index 0000000..c3f8a1b
+--- /dev/null
++++ b/src/main/java/de/nx74205/solardataservice/repository/BatteryOutRepository.java
+@@ -0,0 +1,23 @@
++package de.nx74205.solardataservice.repository;
++
++import de.nx74205.solardataservice.entity.BatteryOut;
++import org.springframework.data.jpa.repository.JpaRepository;
++import org.springframework.data.jpa.repository.Query;
++import org.springframework.stereotype.Repository;
++
++import java.time.LocalDateTime;
++import java.util.List;
++
++@Repository
++public interface BatteryOutRepository extends JpaRepository<BatteryOut, LocalDateTime> {
++
++    List<BatteryOut> findByTimeBetween(LocalDateTime start, LocalDateTime end);
++
++    BatteryOut findTopByOrderByTimeDesc();
++
++    List<BatteryOut> findByTimeAfter(LocalDateTime time);
++
++    @Query("SELECT AVG(CAST(b.value AS double)) FROM BatteryOut b WHERE b.time BETWEEN :start AND :end")
++    Double getAverageValueBetween(LocalDateTime start, LocalDateTime end);
++}
++
+diff --git a/src/main/java/de/nx74205/solardataservice/repository/Item0197Repository.java b/src/main/java/de/nx74205/solardataservice/repository/Item0197Repository.java
+index 1aedb8f..c72331a 100644
+--- a/src/main/java/de/nx74205/solardataservice/repository/Item0197Repository.java
++++ b/src/main/java/de/nx74205/solardataservice/repository/Item0197Repository.java
+@@ -1,27 +1,5 @@
+ package de.nx74205.solardataservice.repository;
+ 
+-import de.nx74205.solardataservice.entity.Item0197;
+-import org.springframework.data.jpa.repository.JpaRepository;
+-import org.springframework.data.jpa.repository.Query;
+-import org.springframework.stereotype.Repository;
+-
+-import java.time.LocalDateTime;
+-import java.util.List;
+-
+-@Repository
+-public interface Item0197Repository extends JpaRepository<Item0197, LocalDateTime> {
+-
+-    // Find all entries between two dates
+-    List<Item0197> findByTimeBetween(LocalDateTime start, LocalDateTime end);
+-
+-    // Find latest entry
+-    Item0197 findTopByOrderByTimeDesc();
+-
+-    // Find all entries after a specific time
+-    List<Item0197> findByTimeAfter(LocalDateTime time);
+-
+-    // Custom query to get average value in a time range
+-    @Query("SELECT AVG(CAST(i.value AS double)) FROM Item0197 i WHERE i.time BETWEEN :start AND :end")
+-    Double getAverageValueBetween(LocalDateTime start, LocalDateTime end);
+-}
+-
++/**
++ * DELETED: Replaced by BatteryInRepository
++ */
+diff --git a/src/main/java/de/nx74205/solardataservice/repository/Item0198Repository.java b/src/main/java/de/nx74205/solardataservice/repository/Item0198Repository.java
+index 5b6bd84..d3e67eb 100644
+--- a/src/main/java/de/nx74205/solardataservice/repository/Item0198Repository.java
++++ b/src/main/java/de/nx74205/solardataservice/repository/Item0198Repository.java
+@@ -1,26 +1,5 @@
+ package de.nx74205.solardataservice.repository;
+ 
+-import de.nx74205.solardataservice.entity.Item0198;
+-import org.springframework.data.jpa.repository.JpaRepository;
+-import org.springframework.data.jpa.repository.Query;
+-import org.springframework.stereotype.Repository;
+-
+-import java.time.LocalDateTime;
+-import java.util.List;
+-
+-@Repository
+-public interface Item0198Repository extends JpaRepository<Item0198, LocalDateTime> {
+-
+-    // Find all entries between two dates
+-    List<Item0198> findByTimeBetween(LocalDateTime start, LocalDateTime end);
+-
+-    // Find latest entry
+-    Item0198 findTopByOrderByTimeDesc();
+-
+-    // Find all entries after a specific time
+-    List<Item0198> findByTimeAfter(LocalDateTime time);
+-
+-    // Custom query to get average value in a time range
+-    @Query("SELECT AVG(CAST(i.value AS double)) FROM Item0198 i WHERE i.time BETWEEN :start AND :end")
+-    Double getAverageValueBetween(LocalDateTime start, LocalDateTime end);
+-}
++/**
++ * DELETED: Replaced by BatteryOutRepository
++ */
+diff --git a/src/main/java/de/nx74205/solardataservice/service/SolarDataService.java b/src/main/java/de/nx74205/solardataservice/service/SolarDataService.java
+index 6a79b3a..d475323 100644
+--- a/src/main/java/de/nx74205/solardataservice/service/SolarDataService.java
++++ b/src/main/java/de/nx74205/solardataservice/service/SolarDataService.java
+@@ -1,9 +1,11 @@
+ package de.nx74205.solardataservice.service;
+ 
+-import de.nx74205.solardataservice.entity.Item0197;
+-import de.nx74205.solardataservice.entity.Item0198;
+-import de.nx74205.solardataservice.repository.Item0197Repository;
+-import de.nx74205.solardataservice.repository.Item0198Repository;
++import de.nx74205.solardataservice.entity.BatteryIn;
++import de.nx74205.solardataservice.entity.BatteryOut;
++import de.nx74205.solardataservice.entity.AcOut;
++import de.nx74205.solardataservice.repository.BatteryInRepository;
++import de.nx74205.solardataservice.repository.BatteryOutRepository;
++import de.nx74205.solardataservice.repository.AcOutRepository;
+ import lombok.RequiredArgsConstructor;
+ import lombok.extern.slf4j.Slf4j;
+ import org.springframework.stereotype.Service;
+@@ -16,49 +18,70 @@ import java.util.List;
+ @RequiredArgsConstructor
+ public class SolarDataService {
+ 
+-    private final Item0197Repository item0197Repository;
+-    private final Item0198Repository item0198Repository;
++    private final BatteryInRepository batteryInRepository;
++    private final BatteryOutRepository batteryOutRepository;
++    private final AcOutRepository acOutRepository;
+ 
+     /**
+-     * Get the latest value from item0197
++     * Get the latest value from BatteryIn
+      */
+-    public Item0197 getLatestItem0197() {
+-        return item0197Repository.findTopByOrderByTimeDesc();
++    public BatteryIn getLatestBatteryIn() {
++        return batteryInRepository.findTopByOrderByTimeDesc();
+     }
+ 
+     /**
+-     * Get the latest value from item0198
++     * Get the latest value from BatteryOut
+      */
+-    public Item0198 getLatestItem0198() {
+-        return item0198Repository.findTopByOrderByTimeDesc();
++    public BatteryOut getLatestBatteryOut() {
++        return batteryOutRepository.findTopByOrderByTimeDesc();
+     }
+ 
+     /**
+-     * Get all item0197 entries in a time range
++     * Get the latest value from AcOut (item0182)
+      */
+-    public List<Item0197> getItem0197InRange(LocalDateTime start, LocalDateTime end) {
+-        return item0197Repository.findByTimeBetween(start, end);
++    public AcOut getLatestAcOut() {
++        return acOutRepository.findTopByOrderByTimeDesc();
+     }
+ 
+     /**
+-     * Get all item0198 entries in a time range
++     * Get all BatteryIn entries in a time range
+      */
+-    public List<Item0198> getItem0198InRange(LocalDateTime start, LocalDateTime end) {
+-        return item0198Repository.findByTimeBetween(start, end);
++    public List<BatteryIn> getBatteryInInRange(LocalDateTime start, LocalDateTime end) {
++        return batteryInRepository.findByTimeBetween(start, end);
+     }
+ 
+     /**
+-     * Get average value for item0197 in a time range
++     * Get all BatteryOut entries in a time range
+      */
+-    public Double getAverageItem0197(LocalDateTime start, LocalDateTime end) {
+-        return item0197Repository.getAverageValueBetween(start, end);
++    public List<BatteryOut> getBatteryOutInRange(LocalDateTime start, LocalDateTime end) {
++        return batteryOutRepository.findByTimeBetween(start, end);
+     }
+ 
+     /**
+-     * Get average value for item0198 in a time range
++     * Get all AcOut entries in a time range
+      */
+-    public Double getAverageItem0198(LocalDateTime start, LocalDateTime end) {
+-        return item0198Repository.getAverageValueBetween(start, end);
++    public List<AcOut> getAcOutInRange(LocalDateTime start, LocalDateTime end) {
++        return acOutRepository.findByTimeBetween(start, end);
+     }
+-}
+ 
++    /**
++     * Get average value for BatteryIn in a time range
++     */
++    public Double getAverageBatteryIn(LocalDateTime start, LocalDateTime end) {
++        return batteryInRepository.getAverageValueBetween(start, end);
++    }
++
++    /**
++     * Get average value for BatteryOut in a time range
++     */
++    public Double getAverageBatteryOut(LocalDateTime start, LocalDateTime end) {
++        return batteryOutRepository.getAverageValueBetween(start, end);
++    }
++
++    /**
++     * Get average value for AcOut in a time range
++     */
++    public Double getAverageAcOut(LocalDateTime start, LocalDateTime end) {
++        return acOutRepository.getAverageValueBetween(start, end);
++    }
++}
+-- 
+2.45.1.windows.1
+
