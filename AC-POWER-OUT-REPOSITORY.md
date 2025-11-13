@@ -90,7 +90,7 @@ curl "http://localhost:8080/api/solar/ac-power-out/average?start=2025-01-01T00:0
 - `getAverageAcPowerOut(LocalDateTime start, LocalDateTime end)` - Gibt den Durchschnittswert zurück
 
 ## Integration mit Hourly Summary
-Das neue Repository ist bereits für die Integration mit dem `/api/solar/hourly-summary` Endpoint vorbereitet und kann bei Bedarf hinzugefügt werden.
+Das neue Repository ist bereits für die Integration mit dem `/api/solar/ac-out/summary` Endpoint vorbereitet und kann bei Bedarf hinzugefügt werden.
 
 ## Build-Status
 - ✅ Entity erstellt

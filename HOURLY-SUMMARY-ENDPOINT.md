@@ -1,11 +1,11 @@
 # Hourly Summary Endpoint
 
 ## Beschreibung
-Der neue REST-Endpoint `/api/solar/hourly-summary` gibt stündliche Summen für alle drei Metriken (BatteryIn, BatteryOut, AcOut) für ein bestimmtes Datum zurück.
+Der neue REST-Endpoint `/api/solar/ac-out/summary` gibt stündliche Summen für alle drei Metriken (BatteryIn, BatteryOut, AcOut) für ein bestimmtes Datum zurück.
 
 ## Endpoint
 
-**GET** `/api/solar/hourly-summary?date=2025-11-01`
+**GET** `/api/solar/ac-out/summary?date=2025-11-01`
 
 ### Parameter
 - `date` (required): Datum im Format `YYYY-MM-DD` (z.B. `2025-11-01`)
@@ -33,15 +33,15 @@ Der neue REST-Endpoint `/api/solar/hourly-summary` gibt stündliche Summen für 
 #### PowerShell
 ```powershell
 # Lokaler Server
-Invoke-RestMethod -Uri "http://localhost:8080/api/solar/hourly-summary?date=2025-11-01" -Method Get
+Invoke-RestMethod -Uri "http://localhost:8080/api/solar/ac-out/summary?date=2025-11-01" -Method Get
 
 # Mit curl
-curl "http://localhost:8080/api/solar/hourly-summary?date=2025-11-01"
+curl "http://localhost:8080/api/solar/ac-out/summary?date=2025-11-01"
 ```
 
 #### Browser
 ```
-http://localhost:8080/api/solar/hourly-summary?date=2025-11-01
+http://localhost:8080/api/solar/ac-out/summary?date=2025-11-01
 ```
 
 ## Funktionsweise
@@ -58,7 +58,7 @@ http://localhost:8080/api/solar/hourly-summary?date=2025-11-01
 - `HourlySummaryDto.java` - DTO für die JSON-Response
 - Query-Methoden in allen drei Repositories: `getHourlySumsByDate(String date)`
 - Service-Methode: `getHourlySummary(LocalDate date)`
-- Controller-Endpoint: `/api/solar/hourly-summary`
+- Controller-Endpoint: `/api/solar/ac-out/summary`
 
 ### Datenbank-Queries
 Die Repositories verwenden native SQL-Queries:
@@ -78,6 +78,6 @@ ORDER BY hour
 .\mvnw.cmd spring-boot:run
 
 # In einem anderen Terminal
-curl "http://localhost:8080/api/solar/hourly-summary?date=2025-01-15"
+curl "http://localhost:8080/api/solar/ac-out/summary?date=2025-01-15"
 ```
 

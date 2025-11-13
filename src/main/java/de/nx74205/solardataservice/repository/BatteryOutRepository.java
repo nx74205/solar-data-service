@@ -26,5 +26,11 @@ public interface BatteryOutRepository extends JpaRepository<BatteryOut, LocalDat
                    "GROUP BY DATE_FORMAT(time, '%Y-%m-%d-%H') " +
                    "ORDER BY hour", nativeQuery = true)
     List<Object[]> getHourlySumsByDate(String date);
-}
 
+    @Query(value = "SELECT DATE(time) as date, SUM(value) as total " +
+                   "FROM item0198 " +
+                   "WHERE time BETWEEN :start AND :end " +
+                   "GROUP BY DATE(time) " +
+                   "ORDER BY date", nativeQuery = true)
+    List<Object[]> getDailySumsBetween(LocalDateTime start, LocalDateTime end);
+}
