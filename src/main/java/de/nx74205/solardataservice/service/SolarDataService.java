@@ -1,9 +1,11 @@
 package de.nx74205.solardataservice.service;
 
-import de.nx74205.solardataservice.entity.Item0197;
-import de.nx74205.solardataservice.entity.Item0198;
-import de.nx74205.solardataservice.repository.Item0197Repository;
-import de.nx74205.solardataservice.repository.Item0198Repository;
+import de.nx74205.solardataservice.entity.BatteryIn;
+import de.nx74205.solardataservice.entity.BatteryOut;
+import de.nx74205.solardataservice.entity.AcOut;
+import de.nx74205.solardataservice.repository.BatteryInRepository;
+import de.nx74205.solardataservice.repository.BatteryOutRepository;
+import de.nx74205.solardataservice.repository.AcOutRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -16,49 +18,70 @@ import java.util.List;
 @RequiredArgsConstructor
 public class SolarDataService {
 
-    private final Item0197Repository item0197Repository;
-    private final Item0198Repository item0198Repository;
+    private final BatteryInRepository batteryInRepository;
+    private final BatteryOutRepository batteryOutRepository;
+    private final AcOutRepository acOutRepository;
 
     /**
-     * Get the latest value from item0197
+     * Get the latest value from BatteryIn
      */
-    public Item0197 getLatestItem0197() {
-        return item0197Repository.findTopByOrderByTimeDesc();
+    public BatteryIn getLatestBatteryIn() {
+        return batteryInRepository.findTopByOrderByTimeDesc();
     }
 
     /**
-     * Get the latest value from item0198
+     * Get the latest value from BatteryOut
      */
-    public Item0198 getLatestItem0198() {
-        return item0198Repository.findTopByOrderByTimeDesc();
+    public BatteryOut getLatestBatteryOut() {
+        return batteryOutRepository.findTopByOrderByTimeDesc();
     }
 
     /**
-     * Get all item0197 entries in a time range
+     * Get the latest value from AcOut (item0182)
      */
-    public List<Item0197> getItem0197InRange(LocalDateTime start, LocalDateTime end) {
-        return item0197Repository.findByTimeBetween(start, end);
+    public AcOut getLatestAcOut() {
+        return acOutRepository.findTopByOrderByTimeDesc();
     }
 
     /**
-     * Get all item0198 entries in a time range
+     * Get all BatteryIn entries in a time range
      */
-    public List<Item0198> getItem0198InRange(LocalDateTime start, LocalDateTime end) {
-        return item0198Repository.findByTimeBetween(start, end);
+    public List<BatteryIn> getBatteryInInRange(LocalDateTime start, LocalDateTime end) {
+        return batteryInRepository.findByTimeBetween(start, end);
     }
 
     /**
-     * Get average value for item0197 in a time range
+     * Get all BatteryOut entries in a time range
      */
-    public Double getAverageItem0197(LocalDateTime start, LocalDateTime end) {
-        return item0197Repository.getAverageValueBetween(start, end);
+    public List<BatteryOut> getBatteryOutInRange(LocalDateTime start, LocalDateTime end) {
+        return batteryOutRepository.findByTimeBetween(start, end);
     }
 
     /**
-     * Get average value for item0198 in a time range
+     * Get all AcOut entries in a time range
      */
-    public Double getAverageItem0198(LocalDateTime start, LocalDateTime end) {
-        return item0198Repository.getAverageValueBetween(start, end);
+    public List<AcOut> getAcOutInRange(LocalDateTime start, LocalDateTime end) {
+        return acOutRepository.findByTimeBetween(start, end);
+    }
+
+    /**
+     * Get average value for BatteryIn in a time range
+     */
+    public Double getAverageBatteryIn(LocalDateTime start, LocalDateTime end) {
+        return batteryInRepository.getAverageValueBetween(start, end);
+    }
+
+    /**
+     * Get average value for BatteryOut in a time range
+     */
+    public Double getAverageBatteryOut(LocalDateTime start, LocalDateTime end) {
+        return batteryOutRepository.getAverageValueBetween(start, end);
+    }
+
+    /**
+     * Get average value for AcOut in a time range
+     */
+    public Double getAverageAcOut(LocalDateTime start, LocalDateTime end) {
+        return acOutRepository.getAverageValueBetween(start, end);
     }
 }
-

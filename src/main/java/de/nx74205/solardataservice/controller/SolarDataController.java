@@ -1,7 +1,7 @@
 package de.nx74205.solardataservice.controller;
 
-import de.nx74205.solardataservice.entity.Item0197;
-import de.nx74205.solardataservice.entity.Item0198;
+import de.nx74205.solardataservice.entity.BatteryIn;
+import de.nx74205.solardataservice.entity.BatteryOut;
 import de.nx74205.solardataservice.service.SolarDataService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -19,71 +19,70 @@ public class SolarDataController {
     private final SolarDataService solarDataService;
 
     /**
-     * GET /api/solar/item0197/latest
-     * Gibt den neuesten Wert von item0197 zurück
+     * GET /api/solar/battery/in/latest
+     * Gibt den neuesten Wert von BatteryIn zurück
      */
-    @GetMapping("/item0197/latest")
-    public ResponseEntity<Item0197> getLatestItem0197() {
-        Item0197 latest = solarDataService.getLatestItem0197();
+    @GetMapping("/battery/in/latest")
+    public ResponseEntity<BatteryIn> getLatestBatteryIn() {
+        BatteryIn latest = solarDataService.getLatestBatteryIn();
         return latest != null ? ResponseEntity.ok(latest) : ResponseEntity.notFound().build();
     }
 
     /**
-     * GET /api/solar/item0198/latest
-     * Gibt den neuesten Wert von item0198 zurück
+     * GET /api/solar/battery/out/latest
+     * Gibt den neuesten Wert von BatteryOut zurück
      */
-    @GetMapping("/item0198/latest")
-    public ResponseEntity<Item0198> getLatestItem0198() {
-        Item0198 latest = solarDataService.getLatestItem0198();
+    @GetMapping("/battery/out/latest")
+    public ResponseEntity<BatteryOut> getLatestBatteryOut() {
+        BatteryOut latest = solarDataService.getLatestBatteryOut();
         return latest != null ? ResponseEntity.ok(latest) : ResponseEntity.notFound().build();
     }
 
     /**
-     * GET /api/solar/item0197/range?start=2025-01-01T00:00:00&end=2025-01-02T00:00:00
-     * Gibt alle item0197 Werte in einem Zeitraum zurück
+     * GET /api/solar/battery/in/range?start=2025-01-01T00:00:00&end=2025-01-02T00:00:00
+     * Gibt alle BatteryIn Werte in einem Zeitraum zurück
      */
-    @GetMapping("/item0197/range")
-    public ResponseEntity<List<Item0197>> getItem0197InRange(
+    @GetMapping("/battery/in/range")
+    public ResponseEntity<List<BatteryIn>> getBatteryInInRange(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime start,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime end) {
-        List<Item0197> data = solarDataService.getItem0197InRange(start, end);
+        List<BatteryIn> data = solarDataService.getBatteryInInRange(start, end);
         return ResponseEntity.ok(data);
     }
 
     /**
-     * GET /api/solar/item0198/range?start=2025-01-01T00:00:00&end=2025-01-02T00:00:00
-     * Gibt alle item0198 Werte in einem Zeitraum zurück
+     * GET /api/solar/battery/out/range?start=2025-01-01T00:00:00&end=2025-01-02T00:00:00
+     * Gibt alle BatteryOut Werte in einem Zeitraum zurück
      */
-    @GetMapping("/item0198/range")
-    public ResponseEntity<List<Item0198>> getItem0198InRange(
+    @GetMapping("/battery/out/range")
+    public ResponseEntity<List<BatteryOut>> getBatteryOutInRange(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime start,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime end) {
-        List<Item0198> data = solarDataService.getItem0198InRange(start, end);
+        List<BatteryOut> data = solarDataService.getBatteryOutInRange(start, end);
         return ResponseEntity.ok(data);
     }
 
     /**
-     * GET /api/solar/item0197/average?start=2025-01-01T00:00:00&end=2025-01-02T00:00:00
-     * Gibt den Durchschnittswert von item0197 in einem Zeitraum zurück
+     * GET /api/solar/battery/in/average?start=2025-01-01T00:00:00&end=2025-01-02T00:00:00
+     * Gibt den Durchschnittswert von BatteryIn in einem Zeitraum zurück
      */
-    @GetMapping("/item0197/average")
-    public ResponseEntity<Double> getAverageItem0197(
+    @GetMapping("/battery/in/average")
+    public ResponseEntity<Double> getAverageBatteryIn(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime start,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime end) {
-        Double average = solarDataService.getAverageItem0197(start, end);
+        Double average = solarDataService.getAverageBatteryIn(start, end);
         return average != null ? ResponseEntity.ok(average) : ResponseEntity.notFound().build();
     }
 
     /**
-     * GET /api/solar/item0198/average?start=2025-01-01T00:00:00&end=2025-01-02T00:00:00
-     * Gibt den Durchschnittswert von item0198 in einem Zeitraum zurück
+     * GET /api/solar/battery/out/average?start=2025-01-01T00:00:00&end=2025-01-02T00:00:00
+     * Gibt den Durchschnittswert von BatteryOut in einem Zeitraum zurück
      */
-    @GetMapping("/item0198/average")
-    public ResponseEntity<Double> getAverageItem0198(
+    @GetMapping("/battery/out/average")
+    public ResponseEntity<Double> getAverageBatteryOut(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime start,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime end) {
-        Double average = solarDataService.getAverageItem0198(start, end);
+        Double average = solarDataService.getAverageBatteryOut(start, end);
         return average != null ? ResponseEntity.ok(average) : ResponseEntity.notFound().build();
     }
 }
-
