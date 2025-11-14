@@ -28,10 +28,10 @@ public class SolarDataController {
     private final SolarDataService solarDataService;
 
     /**
-     * GET /api/solar/battery/in/range?start=2025-01-01T00:00:00&end=2025-01-02T00:00:00
+     * GET /api/solar/battery/charge/range?start=2025-01-01T00:00:00&end=2025-01-02T00:00:00
      * Gibt alle BatteryIn Werte in einem Zeitraum zurück
      */
-    @GetMapping("/battery/in/range")
+    @GetMapping("/battery/charged/range")
     public ResponseEntity<List<BatteryIn>> getBatteryInInRange(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime start,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime end) {
@@ -40,33 +40,31 @@ public class SolarDataController {
     }
 
     /**
-     * GET /api/solar/battery/charged?start=2025-11-01T00:00:00&end=2025-11-13T23:59:59
-     * Gibt die tägliche Gesamtladungsmenge der Batterie für den angegebenen Zeitraum zurück
+     * GET /api/solar/battery/charged?date=2025-11-01
+     * Gibt die tägliche Gesamtladungsmenge der Batterie für das angegebene Datum zurück
      * Beispiel-Response:
-     * [
-     *   {
-     *     "date": "2025-11-01",
-     *     "totalCharged": 8540.2
-     *   },
-     *   {
-     *     "date": "2025-11-02",
-     *     "totalCharged": 9120.5
-     *   }
-     * ]
+     * {
+     *   "date": "2025-11-01",
+     *   "totalCharged": 8540.2
+     * }
      */
     @GetMapping("/battery/charged")
-    public ResponseEntity<List<DailyChargeDto>> getDailyCharge(
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime start,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime end) {
+    public ResponseEntity<DailyChargeDto> getDailyCharge(
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+        LocalDateTime start = date.atStartOfDay();
+        LocalDateTime end = date.plusDays(1).atStartOfDay();
         List<DailyChargeDto> dailyCharge = solarDataService.getDailyChargeSums(start, end);
-        return ResponseEntity.ok(dailyCharge);
+        if (dailyCharge.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(dailyCharge.get(0));
     }
 
     /**
-     * GET /api/solar/battery/out/range?start=2025-01-01T00:00:00&end=2025-01-02T00:00:00
+     * GET /api/solar/battery/discharge/range?start=2025-01-01T00:00:00&end=2025-01-02T00:00:00
      * Gibt alle BatteryOut Werte in einem Zeitraum zurück
      */
-    @GetMapping("/battery/out/range")
+    @GetMapping("/battery/discharged/range")
     public ResponseEntity<List<BatteryOut>> getBatteryOutInRange(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime start,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime end) {
@@ -75,72 +73,66 @@ public class SolarDataController {
     }
 
     /**
-     * GET /api/solar/battery/discharged?start=2025-11-01T00:00:00&end=2025-11-13T23:59:59
-     * Gibt die tägliche Gesamtentladungsmenge der Batterie für den angegebenen Zeitraum zurück
+     * GET /api/solar/battery/discharged?date=2025-11-01
+     * Gibt die tägliche Gesamtentladungsmenge der Batterie für das angegebene Datum zurück
      * Beispiel-Response:
-     * [
-     *   {
-     *     "date": "2025-11-01",
-     *     "totalDischarged": 5420.5
-     *   },
-     *   {
-     *     "date": "2025-11-02",
-     *     "totalDischarged": 6230.8
-     *   }
-     * ]
+     * {
+     *   "date": "2025-11-01",
+     *   "totalDischarged": 5420.5
+     * }
      */
     @GetMapping("/battery/discharged")
-    public ResponseEntity<List<DailyDischargeDto>> getDailyDischarge(
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime start,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime end) {
+    public ResponseEntity<DailyDischargeDto> getDailyDischarge(
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+        LocalDateTime start = date.atStartOfDay();
+        LocalDateTime end = date.plusDays(1).atStartOfDay();
         List<DailyDischargeDto> dailyDischarge = solarDataService.getDailyDischargeSums(start, end);
-        return ResponseEntity.ok(dailyDischarge);
+        if (dailyDischarge.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(dailyDischarge.get(0));
     }
 
     /**
-     * GET /api/solar/grid/export?start=2025-11-01T00:00:00&end=2025-11-13T23:59:59
-     * Gibt die tägliche Grid-Export-Menge für den angegebenen Zeitraum zurück
+     * GET /api/solar/grid/export?date=2025-11-01
+     * Gibt die tägliche Grid-Export-Menge für das angegebene Datum zurück
      * Beispiel-Response:
-     * [
-     *   {
-     *     "date": "2025-11-01",
-     *     "totalExported": 3250.5
-     *   },
-     *   {
-     *     "date": "2025-11-02",
-     *     "totalExported": 4120.8
-     *   }
-     * ]
+     * {
+     *   "date": "2025-11-01",
+     *   "totalExported": 3250.5
+     * }
      */
     @GetMapping("/grid/export")
-    public ResponseEntity<List<DailyGridExportDto>> getDailyGridExport(
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime start,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime end) {
+    public ResponseEntity<DailyGridExportDto> getDailyGridExport(
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+        LocalDateTime start = date.atStartOfDay();
+        LocalDateTime end = date.plusDays(1).atStartOfDay();
         List<DailyGridExportDto> dailyGridExport = solarDataService.getDailyGridExportSums(start, end);
-        return ResponseEntity.ok(dailyGridExport);
+        if (dailyGridExport.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(dailyGridExport.get(0));
     }
 
     /**
-     * GET /api/solar/grid/import?start=2025-11-01T00:00:00&end=2025-11-13T23:59:59
-     * Gibt die tägliche Grid-Import-Menge für den angegebenen Zeitraum zurück
+     * GET /api/solar/grid/import?date=2025-11-01
+     * Gibt die tägliche Grid-Import-Menge für das angegebene Datum zurück
      * Beispiel-Response:
-     * [
-     *   {
-     *     "date": "2025-11-01",
-     *     "totalImported": 2150.3
-     *   },
-     *   {
-     *     "date": "2025-11-02",
-     *     "totalImported": 1980.7
-     *   }
-     * ]
+     * {
+     *   "date": "2025-11-01",
+     *   "totalImported": 2150.3
+     * }
      */
     @GetMapping("/grid/import")
-    public ResponseEntity<List<DailyGridImportDto>> getDailyGridImport(
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime start,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime end) {
+    public ResponseEntity<DailyGridImportDto> getDailyGridImport(
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+        LocalDateTime start = date.atStartOfDay();
+        LocalDateTime end = date.plusDays(1).atStartOfDay();
         List<DailyGridImportDto> dailyGridImport = solarDataService.getDailyGridImportSums(start, end);
-        return ResponseEntity.ok(dailyGridImport);
+        if (dailyGridImport.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(dailyGridImport.get(0));
     }
 
     /**
@@ -177,7 +169,7 @@ public class SolarDataController {
      * GET /api/solar/ac-power-out/range?start=2025-01-01T00:00:00&end=2025-01-02T00:00:00
      * Gibt alle AcPowerOut Werte in einem Zeitraum zurück
      */
-    @GetMapping("/ac-power-out/range")
+    @GetMapping("/ac-out/range")
     public ResponseEntity<List<AcPowerOut>> getAcPowerOutInRange(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime start,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime end) {

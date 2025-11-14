@@ -5,13 +5,11 @@ import de.nx74205.solardataservice.dto.DailyDischargeDto;
 import de.nx74205.solardataservice.dto.DailyChargeDto;
 import de.nx74205.solardataservice.dto.DailyGridExportDto;
 import de.nx74205.solardataservice.dto.DailyGridImportDto;
+import de.nx74205.solardataservice.dto.DailySumsDto;
 import de.nx74205.solardataservice.entity.BatteryIn;
 import de.nx74205.solardataservice.entity.BatteryOut;
-import de.nx74205.solardataservice.entity.AcOut;
 import de.nx74205.solardataservice.entity.AcPowerOut;
 import de.nx74205.solardataservice.entity.BatterySocPercent;
-import de.nx74205.solardataservice.entity.GridExport;
-import de.nx74205.solardataservice.entity.GridImport;
 import de.nx74205.solardataservice.repository.BatteryInRepository;
 import de.nx74205.solardataservice.repository.BatteryOutRepository;
 import de.nx74205.solardataservice.repository.AcOutRepository;
@@ -69,6 +67,7 @@ public class SolarDataService {
         return acPowerOutRepository.findByTimeBetween(start, end);
     }
 
+
     /**
      * Get the latest value from BatterySocPercent
      */
@@ -83,14 +82,14 @@ public class SolarDataService {
         String dateString = date.toString();
 
         // Get hourly sums from all three repositories
-        List<Object[]> batteryInData = batteryInRepository.getHourlySumsByDate(dateString);
-        List<Object[]> batteryOutData = batteryOutRepository.getHourlySumsByDate(dateString);
-        List<Object[]> acOutData = acOutRepository.getHourlySumsByDate(dateString);
+        List<DailySumsDto> batteryInData = batteryInRepository.getHourlySumsByDate(dateString);
+        List<DailySumsDto> batteryOutData = batteryOutRepository.getHourlySumsByDate(dateString);
+        List<DailySumsDto> acOutData = acOutRepository.getHourlySumsByDate(dateString);
 
         // Convert to maps for easier lookup: hour -> sum
-        Map<String, Double> batteryInMap = convertToMap(batteryInData);
-        Map<String, Double> batteryOutMap = convertToMap(batteryOutData);
-        Map<String, Double> acOutMap = convertToMap(acOutData);
+        Map<String, Double> batteryInMap = convertDtoToMap(batteryInData);
+        Map<String, Double> batteryOutMap = convertDtoToMap(batteryOutData);
+        Map<String, Double> acOutMap = convertDtoToMap(acOutData);
 
         // Get all unique hours
         Set<String> allHours = new TreeSet<>();
@@ -113,14 +112,10 @@ public class SolarDataService {
      * Get daily discharge sums for battery out in a time range
      */
     public List<DailyDischargeDto> getDailyDischargeSums(LocalDateTime start, LocalDateTime end) {
-        List<Object[]> dailyData = batteryOutRepository.getDailySumsBetween(start, end);
+        List<DailySumsDto> dailyData = batteryOutRepository.getDailySumsBetween(start, end);
 
         return dailyData.stream()
-                .map(row -> {
-                    String date = row[0].toString();
-                    Double total = row[1] != null ? ((Number) row[1]).doubleValue() : 0.0;
-                    return new DailyDischargeDto(date, total);
-                })
+                .map(dto -> new DailyDischargeDto(dto.getDate(), dto.getValue()))
                 .collect(Collectors.toList());
     }
 
@@ -128,71 +123,22 @@ public class SolarDataService {
      * Get daily charge sums for battery in in a time range
      */
     public List<DailyChargeDto> getDailyChargeSums(LocalDateTime start, LocalDateTime end) {
-        List<Object[]> dailyData = batteryInRepository.getDailySumsBetween(start, end);
+        List<DailySumsDto> dailyData = batteryInRepository.getDailySumsBetween(start, end);
 
         return dailyData.stream()
-                .map(row -> {
-                    String date = row[0].toString();
-                    Double total = row[1] != null ? ((Number) row[1]).doubleValue() : 0.0;
-                    return new DailyChargeDto(date, total);
-                })
+                .map(dto -> new DailyChargeDto(dto.getDate(), dto.getValue()))
                 .collect(Collectors.toList());
     }
 
-    /**
-     * Get the latest value from GridExport
-     */
-    public GridExport getLatestGridExport() {
-        return gridExportRepository.findTopByOrderByTimeDesc();
-    }
-
-    /**
-     * Get all GridExport entries in a time range
-     */
-    public List<GridExport> getGridExportInRange(LocalDateTime start, LocalDateTime end) {
-        return gridExportRepository.findByTimeBetween(start, end);
-    }
-
-    /**
-     * Get average value for GridExport in a time range
-     */
-    public Double getAverageGridExport(LocalDateTime start, LocalDateTime end) {
-        return gridExportRepository.getAverageValueBetween(start, end);
-    }
-
-    /**
-     * Get the latest value from GridImport
-     */
-    public GridImport getLatestGridImport() {
-        return gridImportRepository.findTopByOrderByTimeDesc();
-    }
-
-    /**
-     * Get all GridImport entries in a time range
-     */
-    public List<GridImport> getGridImportInRange(LocalDateTime start, LocalDateTime end) {
-        return gridImportRepository.findByTimeBetween(start, end);
-    }
-
-    /**
-     * Get average value for GridImport in a time range
-     */
-    public Double getAverageGridImport(LocalDateTime start, LocalDateTime end) {
-        return gridImportRepository.getAverageValueBetween(start, end);
-    }
 
     /**
      * Get daily grid export sums in a time range
      */
     public List<DailyGridExportDto> getDailyGridExportSums(LocalDateTime start, LocalDateTime end) {
-        List<Object[]> dailyData = gridExportRepository.getDailySumsBetween(start, end);
+        List<DailySumsDto> dailyData = gridExportRepository.getDailySumsBetween(start, end);
 
         return dailyData.stream()
-                .map(row -> {
-                    String date = row[0].toString();
-                    Double total = row[1] != null ? ((Number) row[1]).doubleValue() : 0.0;
-                    return new DailyGridExportDto(date, total);
-                })
+                .map(dto -> new DailyGridExportDto(dto.getDate(), dto.getValue()))
                 .collect(Collectors.toList());
     }
 
@@ -200,24 +146,21 @@ public class SolarDataService {
      * Get daily grid import sums in a time range
      */
     public List<DailyGridImportDto> getDailyGridImportSums(LocalDateTime start, LocalDateTime end) {
-        List<Object[]> dailyData = gridImportRepository.getDailySumsBetween(start, end);
+        List<DailySumsDto> dailyData = gridImportRepository.getDailySumsBetween(start, end);
 
         return dailyData.stream()
-                .map(row -> {
-                    String date = row[0].toString();
-                    Double total = row[1] != null ? ((Number) row[1]).doubleValue() : 0.0;
-                    return new DailyGridImportDto(date, total);
-                })
+                .map(dto -> new DailyGridImportDto(dto.getDate(), dto.getValue()))
                 .collect(Collectors.toList());
     }
 
-    private Map<String, Double> convertToMap(List<Object[]> data) {
+    private Map<String, Double> convertDtoToMap(List<DailySumsDto> data) {
         Map<String, Double> map = new HashMap<>();
-        for (Object[] row : data) {
-            String hour = (String) row[0];
-            Double sum = row[1] != null ? ((Number) row[1]).doubleValue() : 0.0;
+        for (DailySumsDto dto : data) {
+            String hour = dto.getDate();
+            Double sum = dto.getValue() != null ? dto.getValue() : 0.0;
             map.put(hour, sum);
         }
         return map;
     }
 }
+
