@@ -14,12 +14,6 @@ public interface BatteryOutRepository extends JpaRepository<BatteryOut, LocalDat
 
     List<BatteryOut> findByTimeBetween(LocalDateTime start, LocalDateTime end);
 
-    BatteryOut findTopByOrderByTimeDesc();
-
-    List<BatteryOut> findByTimeAfter(LocalDateTime time);
-
-    @Query("SELECT AVG(CAST(b.value AS double)) FROM BatteryOut b WHERE b.time BETWEEN :start AND :end")
-    Double getAverageValueBetween(LocalDateTime start, LocalDateTime end);
 
     @Query(value = "SELECT 'BATTERY_OUT' as entityName, DATE_FORMAT(time, '%Y-%m-%d-%H') as date, SUM(value) as value " +
                    "FROM item0198 " +

@@ -12,14 +12,6 @@ import java.util.List;
 @Repository
 public interface AcOutRepository extends JpaRepository<AcOut, LocalDateTime> {
 
-    List<AcOut> findByTimeBetween(LocalDateTime start, LocalDateTime end);
-
-    AcOut findTopByOrderByTimeDesc();
-
-    List<AcOut> findByTimeAfter(LocalDateTime time);
-
-    @Query("SELECT AVG(CAST(a.value AS double)) FROM AcOut a WHERE a.time BETWEEN :start AND :end")
-    Double getAverageValueBetween(LocalDateTime start, LocalDateTime end);
 
     @Query(value = "SELECT 'AC_OUT' as entityName, DATE_FORMAT(time, '%Y-%m-%d-%H') as date, SUM(value) as value " +
                    "FROM item0182 " +
