@@ -74,7 +74,7 @@ curl http://localhost:8080/api/solar/ac-out/currentPower
 
 ### Werte in einem Zeitraum abrufen
 ```bash
-curl "http://localhost:8080/api/solar/ac-power-out/range?start=2025-11-13T00:00:00&end=2025-11-13T23:59:59"
+curl "http://localhost:8080/api/solar/ac-out/range?start=2025-11-13T00:00:00&end=2025-11-13T23:59:59"
 ```
 
 ---
@@ -83,7 +83,7 @@ curl "http://localhost:8080/api/solar/ac-power-out/range?start=2025-11-13T00:00:
 
 ### Werte in einem Zeitraum abrufen
 ```bash
-curl "http://localhost:8080/api/solar/battery/in/range?start=2025-11-13T00:00:00&end=2025-11-13T23:59:59"
+curl "http://localhost:8080/api/solar/battery/charged/range?start=2025-11-13T00:00:00&end=2025-11-13T23:59:59"
 ```
 
 **Beispiel-Response:**
@@ -129,7 +129,7 @@ Invoke-RestMethod -Uri "http://localhost:8080/api/solar/battery/charged?date=$da
 
 ### Werte in einem Zeitraum abrufen
 ```bash
-curl "http://localhost:8080/api/solar/battery/discharge/range?start=2025-11-13T00:00:00&end=2025-11-13T23:59:59"
+curl "http://localhost:8080/api/solar/battery/discharged/range?start=2025-11-13T00:00:00&end=2025-11-13T23:59:59"
 ```
 
 ### Tägliche Entladungssummen abrufen (für ein Datum)
@@ -151,6 +151,56 @@ curl "http://localhost:8080/api/solar/battery/discharged?date=2025-11-01"
 ```powershell
 $date = "2025-11-01"
 Invoke-RestMethod -Uri "http://localhost:8080/api/solar/battery/discharged?date=$date" -Method Get
+```
+
+---
+
+## Grid Export (Netzeinspeisung)
+
+### Tägliche Netzeinspeisung abrufen
+Gibt die Gesamtmenge der ins Netz eingespeisten Energie für einen bestimmten Tag zurück.
+
+```bash
+curl "http://localhost:8080/api/solar/grid/export?date=2025-11-01"
+```
+
+**Beispiel-Response:**
+```json
+{
+  "date": "2025-11-01",
+  "totalExported": 3250.5
+}
+```
+
+**PowerShell (einzelnes Datum):**
+```powershell
+$date = "2025-11-01"
+Invoke-RestMethod -Uri "http://localhost:8080/api/solar/grid/export?date=$date" -Method Get
+```
+
+---
+
+## Grid Import (Netzbezug)
+
+### Täglichen Netzbezug abrufen
+Gibt die Gesamtmenge der aus dem Netz bezogenen Energie für einen bestimmten Tag zurück.
+
+```bash
+curl "http://localhost:8080/api/solar/grid/import?date=2025-11-01"
+```
+
+**Beispiel-Response:**
+```json
+{
+  "date": "2025-11-01",
+  "totalImported": 2150.3
+}
+```
+
+**PowerShell (einzelnes Datum):**
+```powershell
+$date = "2025-11-01"
+Invoke-RestMethod -Uri "http://localhost:8080/api/solar/grid/import?date=$date" -Method Get
 ```
 
 ---
@@ -218,8 +268,8 @@ $startStr = $start.ToString("yyyy-MM-ddTHH:mm:ss")
 $endStr = $end.ToString("yyyy-MM-ddTHH:mm:ss")
 
 # Beispiel: AC Power Range
-$avgAcPower = Invoke-RestMethod -Uri "http://localhost:8080/api/solar/ac-power-out/range?start=$startStr&end=$endStr" -Method Get
-Write-Host "Durchschnittliche AC-Leistung (24h): $avgAcPower W"
+$acPowerData = Invoke-RestMethod -Uri "http://localhost:8080/api/solar/ac-out/range?start=$startStr&end=$endStr" -Method Get
+Write-Host "Anzahl der AC-Power-Werte (24h): $($acPowerData.Count)"
 ```
 
 ### Tägliche Entladungssummen der letzten 7 Tage
