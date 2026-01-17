@@ -16,14 +16,14 @@ public interface BatteryOutRepository extends JpaRepository<BatteryOut, LocalDat
 
 
     @Query(value = "SELECT 'BATTERY_OUT' as entityName, DATE_FORMAT(time, '%Y-%m-%d-%H') as date, SUM(value) as value " +
-                   "FROM item0198 " +
+                   "FROM item0038 " +
                    "WHERE DATE(time) = :date " +
                    "GROUP BY DATE_FORMAT(time, '%Y-%m-%d-%H') " +
                    "ORDER BY date", nativeQuery = true)
     List<DailySumsDto> getHourlySumsByDate(String date);
 
     @Query(value = "SELECT 'BATTERY_OUT' as entityName, DATE_FORMAT(DATE(time), '%Y-%m-%d') as date, SUM(value) as value " +
-                   "FROM item0198 " +
+                   "FROM item0038 " +
                    "WHERE time BETWEEN :start AND :end " +
                    "GROUP BY DATE(time) " +
                    "ORDER BY date", nativeQuery = true)

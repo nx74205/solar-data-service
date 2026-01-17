@@ -14,7 +14,7 @@ public interface AcOutRepository extends JpaRepository<AcOut, LocalDateTime> {
 
 
     @Query(value = "SELECT 'AC_OUT' as entityName, DATE_FORMAT(time, '%Y-%m-%d-%H') as date, SUM(value) as value " +
-                   "FROM item0182 " +
+                   "FROM item0034 " +
                    "WHERE DATE(time) = :date " +
                    "GROUP BY DATE_FORMAT(time, '%Y-%m-%d-%H') " +
                    "ORDER BY date", nativeQuery = true)

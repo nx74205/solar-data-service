@@ -6,7 +6,7 @@ import java.time.LocalDateTime;
 
 @Data
 @Entity
-@Table(name = "item0181")
+@Table(name = "item0033")
 public class AcPowerOut {
 
     @Id

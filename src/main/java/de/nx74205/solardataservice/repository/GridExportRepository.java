@@ -14,7 +14,7 @@ public interface GridExportRepository extends JpaRepository<GridExport, LocalDat
 
 
     @Query(value = "SELECT 'GRID_EXPORT' as entityName, DATE_FORMAT(DATE(time), '%Y-%m-%d') as date, SUM(value) as value " +
-                   "FROM item0183 " +
+                   "FROM item0031 " +
                    "WHERE time BETWEEN :start AND :end " +
                    "GROUP BY DATE(time) " +
                    "ORDER BY date", nativeQuery = true)

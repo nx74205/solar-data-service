@@ -14,7 +14,7 @@ public interface GridImportRepository extends JpaRepository<GridImport, LocalDat
 
 
     @Query(value = "SELECT 'GRID_IMPORT' as entityName, DATE_FORMAT(DATE(time), '%Y-%m-%d') as date, SUM(value) as value " +
-                   "FROM item0184 " +
+                   "FROM item0032 " +
                    "WHERE time BETWEEN :start AND :end " +
                    "GROUP BY DATE(time) " +
                    "ORDER BY date", nativeQuery = true)

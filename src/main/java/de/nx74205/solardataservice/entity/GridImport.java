@@ -6,7 +6,7 @@ import java.time.LocalDateTime;
 
 @Data
 @Entity
-@Table(name = "item0184")
+@Table(name = "item0032")
 public class GridImport {
 
     @Id

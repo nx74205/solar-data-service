@@ -6,7 +6,7 @@ import java.time.LocalDateTime;
 
 @Data
 @Entity
-@Table(name = "item0198")
+@Table(name = "item0038")
 public class BatteryOut {
 
     @Id

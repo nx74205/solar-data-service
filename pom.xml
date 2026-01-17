@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>de.nx74205</groupId>
 	<artifactId>solar-data-service</artifactId>
-	<version>1.0.0</version>
+	<version>1.0.1</version>
 	<name>solar-data-service</name>
 	<description>solar-data-service</description>
 	<url/>
@@ -50,6 +50,13 @@
 			<groupId>org.mariadb.jdbc</groupId>
 			<artifactId>mariadb-java-client</artifactId>
 			<scope>runtime</scope>
+		</dependency>
+
+		<!-- H2 Database for testing -->
+		<dependency>
+			<groupId>com.h2database</groupId>
+			<artifactId>h2</artifactId>
+			<scope>test</scope>
 		</dependency>
 
 		<dependency>

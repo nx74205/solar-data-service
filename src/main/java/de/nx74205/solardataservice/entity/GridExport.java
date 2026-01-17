@@ -6,7 +6,7 @@ import java.time.LocalDateTime;
 
 @Data
 @Entity
-@Table(name = "item0183")
+@Table(name = "item0031")
 public class GridExport {
 
     @Id
